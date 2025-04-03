@@ -37,7 +37,7 @@ export class DouBiZJSJ implements ISource {
 }
 
 export class DouTuSource implements ISource {
-  name = "Source 2";
+  name = "luccy斗图";
   get = async (keyword: string | null, pageIndex: number): Promise<{ isEnd: boolean; images: IDoutuImage[] }> => {
     keyword = keyword && keyword.trim() !== "" ? keyword : defaultKeyword;
     const response = await fetch(
@@ -56,18 +56,18 @@ export class DouTuSource implements ISource {
         json.items.filter((o) => !o.url.includes("/keyWordPic/")),
         (o) => o.url,
       ).map((item) => {
-        return { id: uuidv4(), url: item.url.replace("http:", "https:") };
+        return { id: uuidv4(), url: item.url };
       }),
     };
   };
 }
 
 export class DouTuLaSource implements ISource {
-  name = "Source 3";
+  name = "pk斗图";
   get = async (keyword: string | null, pageIndex: number): Promise<{ isEnd: boolean; images: IDoutuImage[] }> => {
     keyword = keyword && keyword.trim() !== "" ? keyword : defaultKeyword;
     const response = await fetch(
-      `https://www.pkdoutu.com/search?type=photo&more=1&keyword=${keyword}&page=${pageIndex}`,
+      `http://www.pkdoutu.com/search?type=photo&more=1&keyword=${keyword}&page=${pageIndex}`,
     );
     const $ = cheerio.load(await response.text());
     const nodes = $("div.search-result.list-group-item").find("img.img-responsive").toArray();
