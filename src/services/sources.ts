@@ -1,3 +1,4 @@
+import { string } from './../../node_modules/@types/prop-types/index.d';
 import fetch from "node-fetch";
 import * as cheerio from "cheerio";
 import { v4 as uuidv4 } from "uuid";
@@ -75,6 +76,32 @@ export class DouTuLaSource implements ISource {
       images: duplication(
         nodes.map((node) => {
           return { id: uuidv4(), url: node.attribs["data-backup"].replace("http:", "https:") };
+        }),
+        (o) => o.url,
+      ),
+    };
+  };
+}
+
+export class ApiBoxSource implements ISource {
+  name = "Api Box";
+  get = async (keyword: string | null, pageIndex: number): Promise<{ isEnd: boolean; images: IDoutuImage[] }> => {
+    keyword = keyword && keyword.trim() !== "" ? keyword : defaultKeyword;
+    const response = await fetch(
+      `https://cn.apihz.cn/api/img/apihzbqbbaidu.php?id=10003681&key=32183d504a83b9678ab2737d081e70d2&limit=20&page=${pageIndex}&words=${keyword}`,
+    );
+    const json = (await response.json()) as {
+      code: number;
+      page: string;
+      maxpage: number;
+      count: number;
+      res: string[];
+    };
+    return {
+      isEnd: json.maxpage == pageIndex,
+      images: duplication(
+        json.res.map((item) => {
+          return { id: uuidv4(), url: item };
         }),
         (o) => o.url,
       ),
